@@ -29,6 +29,7 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <ros/ros.h>
+#include <rtcm_msgs/Message.h>
 
 #include "parameter_manager.hpp"
 #include "serial_handler.hpp"
@@ -138,6 +139,10 @@ int main(int argc, char **argv)
         output_serial.reset(new SerialHandler(pm.output_serial_port, pm.serial_baud_rate));
     }
     
+    ros::Publisher rtcm_pub;
+    if (pm.to_ros)
+        rtcm_pub = nh.advertise<rtcm_msgs::Message>("/rtcm", 10);
+
     if (pm.online)
     {
         serial.reset(new SerialHandler(pm.input_serial_port, pm.serial_baud_rate));
@@ -153,8 +158,18 @@ int main(int argc, char **argv)
         if (pm.input_rtcm)
         {
             socket.reset(new SocketHandler("localhost", pm.rtcm_tcp_port));
+            // 原有：收到数据写串口
             socket->addCallback(std::bind(&SerialHandler::writeRaw, serial.get(), 
                 std::placeholders::_1, std::placeholders::_2, pm.IO_TIMEOUT_MS));
+            // 新增：收到数据发布ROS消息
+            if (pm.to_ros) {
+                socket->addCallback([&rtcm_pub](const uint8_t* data, size_t len) {
+                    rtcm_msgs::Message msg;
+                    msg.header.stamp = ros::Time::now();
+                    msg.message.assign(data, data + len);
+                    rtcm_pub.publish(msg);
+                });
+            }
             socket->startRead();
         }
         

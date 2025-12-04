@@ -449,7 +449,7 @@ std::vector<ObsPtr> UbloxMessageProcessor::parse_meas_msg(const uint8_t *msg_dat
 
         if (sid == 0 || sid > N_FREQ)
         {
-            LOG(ERROR) << "ubx rxmrawx signal error: sat=" << sat << " signal_id=" << sid;
+            //LOG(ERROR) << "ubx rxmrawx signal error: sat=" << sat << " signal_id=" << sid;
             continue;
         }
 
@@ -1493,10 +1493,10 @@ int UbloxMessageProcessor::sig_idx(const int sys, const int code)
         if (code==CODE_L7I) return 2; /* E5bI */
         if (code==CODE_L7Q) return 2; /* E5bQ */
     }
-    // else if (sys == SYS_QZS) {
-    //     if (code==CODE_L1C) return 1;
-    //     if (code==CODE_L2L) return 2;
-    // }
+    else if (sys == SYS_QZS) {
+        if (code==CODE_L1C) return 1;
+        if (code==CODE_L2L) return 2;
+    }
     else if (sys == SYS_BDS) {
         if (code==CODE_L1I) return 1;
         if (code==CODE_L7I) return 2;
