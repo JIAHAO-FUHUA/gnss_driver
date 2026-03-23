@@ -22,6 +22,7 @@
 #define UBLOX_MESSAGE_PROCESSOR_HPP_
 
 #include <map>
+#include <mutex>
 #include <ros/ros.h>
 #include <sensor_msgs/NavSatFix.h>
 #include <glog/logging.h>
@@ -46,6 +47,7 @@ class UbloxMessageProcessor
 
     private:
         void parse_ion_utc(const uint8_t *data, const size_t header_len);
+        void ephemTimerCallback(const ros::TimerEvent &event);
         TimePulseInfoPtr parse_time_pulse(const uint8_t *msg_data, const uint32_t msg_len);
         PVTSolutionPtr parse_pvt(const uint8_t *msg_data, const uint32_t msg_len);
 
@@ -66,10 +68,7 @@ class UbloxMessageProcessor
 
         /* signal index in obs data --------------------------------------------------*/
         int sig_idx(const int sys, const int code);
-
-        // /* signal index for more code type --sbs */
-        // int sig_idx_ipnl( int sys,  int code);
-
+        
         /* ubx sigid to signal ([5] Appendix B) --------------------------------------*/
         int ubx_sig(const int sys, const int sigid);
 
@@ -126,20 +125,11 @@ class UbloxMessageProcessor
         ros::NodeHandle nh_;
         ros::Publisher pub_pvt_, pub_lla_;
         ros::Publisher pub_tp_info_;
-        ros::Publisher pub_range_meas_,pub_rover_,pub_reference_, pub_ephem_, pub_glo_ephem_,pub_ori_ephem_,pub_ori_glo_ephem_, pub_iono_;  //--sbs
-        //GnssEphemerides ephemerides_; //--sbs
-        GnssEphemMsgarray ephemarray_;
-        ros::Publisher pub_ephem_array;
-        const uint32_t MSG_HEADER_LEN;
-
-        
-
+        ros::Publisher pub_range_meas_, pub_ori_ephem_, pub_ori_glo_ephem_, pub_ephem_array, pub_iono_;
         ros::Timer ephem_timer_;
-
-        // time recall
-        void ephemTimerCallback(const ros::TimerEvent&);
-
-        std::mutex ephem_mutex_;  
+        std::mutex ephem_mutex_;
+        GnssEphemMsgarray ephemarray_;
+        const uint32_t MSG_HEADER_LEN;
 
         static constexpr uint8_t UBX_SYNC_1 = 0xB5;        // ubx message sync code 1
         static constexpr uint8_t UBX_SYNC_2 = 0x62;        // ubx message sync code 2

@@ -158,11 +158,10 @@ int main(int argc, char **argv)
         if (pm.input_rtcm)
         {
             socket.reset(new SocketHandler("localhost", pm.rtcm_tcp_port));
-            // 原有：收到数据写串口
             socket->addCallback(std::bind(&SerialHandler::writeRaw, serial.get(), 
                 std::placeholders::_1, std::placeholders::_2, pm.IO_TIMEOUT_MS));
-            // 新增：收到数据发布ROS消息
-            if (pm.to_ros) {
+            if (pm.to_ros)
+            {
                 socket->addCallback([&rtcm_pub](const uint8_t* data, size_t len) {
                     rtcm_msgs::Message msg;
                     msg.header.stamp = ros::Time::now();
