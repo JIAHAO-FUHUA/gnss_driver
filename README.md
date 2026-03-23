@@ -1,9 +1,14 @@
-# ublox_driver
+# gnss_driver
 
-**Authors/Maintainers:** CAO Shaozu (shaozu.cao AT gmail.com)
+**Original Author:** CAO Shaozu (shaozu.cao AT gmail.com)
 
-The gnss_driver has revised the ephemeris problem, and add the topic /rtcm, the type is rtcm_msgs, rtcm3.
+**Maintainer:** [JIAHAO-FUHUA](https://github.com/JIAHAO-FUHUA) (yh701219 AT gmail.com)
+
+This fork fixes the ephemeris parsing issue and adds RTCM3 message publishing on the `/rtcm` topic (type: `rtcm_msgs/Message`).
+
+```bash
 sudo apt install ros-noetic-rtcm-msgs
+```
 
 The *ublox_driver* provides essential functionalities for u-blox GNSS receivers. This package is originally designed for [u-blox ZED-F9P module](https://www.u-blox.com/en/product/zed-f9p-module) according to the specification [UBX-18010854](https://www.u-blox.com/en/docs/UBX-18010854), but should also be compatible to other 8-series or 9-series u-blox receivers as long as the interface is the same.
 
